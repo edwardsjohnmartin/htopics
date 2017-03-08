@@ -6,9 +6,10 @@ from collections import Counter
 normalizr = Normalizr(language='en')
 graph = nx.Graph()
 
-fileName = "a.txt"
+fileName = "tweet database.txt"
 historyData = set()
-historyFile = open("HistoryData.txt", 'r')
+#historyFile = open("HistoryData.txt", 'r')
+historyFile = open("tweet database.txt", 'r')
 historyData = historyFile.readlines()
 
 print(historyData)
