@@ -1,3 +1,5 @@
+import sys
+import nltk
 import networkx as nx
 import matplotlib.pyplot as plotter
 from normalizr import Normalizr
@@ -29,7 +31,10 @@ neighborNum = int(input("Min num neighbors for each node (2 or more):\r\n"))
 
 #Graph variables
 graph = nx.Graph()
-fileName = "a.txt"
+#fileName = "a.txt"
+fileName = "a5k.txt"
+if (len(sys.argv) > 1):
+    fileName = sys.argv[1]
 historyData = set()
 historyFile = open("a.txt", 'r')
 historyData = historyFile.readlines()
@@ -39,15 +44,31 @@ content = readFile.readlines()
 numWords = 0
 minEdgeWeight = 1
 edgeWeightList = []
-print(len(content))
+#print(len(content))
 
 #Creates the corpus----------------------------------------------------
-for x in range(0, crpMaxX):  
+words = [normalizr.normalize(word) for word in crpLines]
+words = [word for word in words if len(word) > 1]
+words = [word.lower() for word in words]
+tagged = nltk.tag.pos_tag(words)
+#print(crpLines[0])
+propernouns = [word for word,pos in tagged if pos == 'NNP']
+with open('names.txt', 'w') as f:
+    for n in propernouns:
+        f.write("%s " % n)
+#print(len(words))
+#print(len(propernouns))
+numWords = len(propernouns)
+#for x in range(0, crpMaxX):  
+for x in range(0, numWords):  
     if (x % 100 == 0):
         print(x)
-    for y in range(1, min(neighborNum+1, (crpMaxX-x))):
-        firstWord = crpLines[x]
-        secondWord = crpLines[x+y]
+    #for y in range(1, min(neighborNum+1, (crpMaxX-x))):
+    for y in range(1, min(neighborNum+1, (numWords-x))):
+        #firstWord = crpLines[x]
+        #secondWord = crpLines[x+y]
+        firstWord = propernouns[x]
+        secondWord = propernouns[x+y]
         if (True):#firstWord[0].isupper() and firstWord[1].islower() and secondWord[0].isupper() and secondWord[1].islower()):
             firstWord = firstWord.lower()
             secondWord = secondWord.lower()
@@ -80,10 +101,16 @@ crpEdgeList = corpus.edges()
 crpEdgeWeightList = []
 crpNodeList = corpus.nodes()
 
-for edge in crpEdgeList:
-    dict = corpus.get_edge_data(*edge)
-    edgeWeight = dict['weight']
-    edgeWeightList.append(edgeWeight)
+#for edge in crpEdgeList:
+#    dict = corpus.get_edge_data(*edge)
+#    edgeWeight = dict['weight']
+#    edgeWeightList.append(edgeWeight)
+
+#nx.draw(corpus, with_labels = True, node_size=1000, node_color="g", font_size=10)
+#plotter.show()
+
+#exit()
+
 #--------------------------------------------------------------------
 
 bannedWords = ["", "rt", "amp"]
@@ -107,21 +134,27 @@ for x in range(0, len(content)):
         word = stringList[x][i]
         if (word in crpNodeList):
             numWordsInCorpus = numWordsInCorpus + 1;
-    if (numWordsInCorpus >= 3):
+    if (numWordsInCorpus > 1):
         for i in range(0, numWords):
             firstWord = stringList[x][i]
             for j in range(i+1, numWords):
                 secondWord = stringList[x][j]
-                if graph.has_edge(firstWord, secondWord):
-                    updatedWeight = graph[firstWord][secondWord]['weight'] + 1
-                    graph.add_edge(firstWord, secondWord, weight=updatedWeight)
-                #elif corpus.has_edge(firstWord, secondWord):
-                #    crpEdgeWeight = corpus[firstWord][secondWord]['weight']
-                #    graph.add_edge(firstWord, secondWord, weight=crpEdgeWeight)
-                elif (firstWord not in bannedWords) and (secondWord not in bannedWords):
-                    graph.add_edge(firstWord, secondWord, weight=minEdgeWeight)
+                w = 1
+                if (firstWord in crpNodeList or secondWord in crpNodeList):
+                #if (firstWord in crpNodeList and secondWord in crpNodeList):
+                    if graph.has_edge(firstWord, secondWord):
+                        updatedWeight = graph[firstWord][secondWord]['weight'] + w
+                        graph.add_edge(firstWord, secondWord, weight=updatedWeight)
+                        #elif corpus.has_edge(firstWord, secondWord):
+                        #    crpEdgeWeight = corpus[firstWord][secondWord]['weight']
+                        #    graph.add_edge(firstWord, secondWord, weight=crpEdgeWeight)
+                    elif (firstWord not in bannedWords) and (secondWord not in bannedWords):
+                        #graph.add_edge(firstWord, secondWord, weight=minEdgeWeight)
+                        graph.add_edge(firstWord, secondWord, weight=w)
                     
 edgeList = graph.edges()
+
+#print("edges = ", graph.edges())
 
 for edge in edgeList:
     dict = graph.get_edge_data(*edge)
