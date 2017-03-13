@@ -16,12 +16,13 @@ crpFileName = "history.txt"
 #crpLines = crpLines.split(" ")
 #crpLines = [str for str in crpLines if str != ""]
 
-crpLines = []
+crpLines = set()#[]
 with open(crpFileName,'r') as f:
     for line in f:
         for word in line.split():
-            if (word != "" and len(word) > 2 and word[0].isupper() and word[1].islower()):
-                crpLines.append(word)
+            #if (word != "" and len(word) > 2 and word[0].isupper() and word[1].islower()):
+            #crpLines.append(word)
+            crpLines.add(word)
 
 crpEdgeWeight = 1
 capNodeWeight = 5
@@ -52,7 +53,10 @@ words = [word for word in words if len(word) > 1]
 words = [word.lower() for word in words]
 tagged = nltk.tag.pos_tag(words)
 #print(crpLines[0])
-propernouns = [word for word,pos in tagged if pos == 'NNP']
+propernouns = [word for word,pos in tagged if pos == 'NNP' or pos == 'NP']
+print("words " + str(len(words)))
+print("lines " + str(len(crpLines)))
+print("proper nouns = " + str(len(propernouns)))
 with open('names.txt', 'w') as f:
     for n in propernouns:
         f.write("%s " % n)
