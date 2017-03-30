@@ -8,32 +8,32 @@ from collections import Counter
 normalizr = Normalizr(language='en')
 
 #Corpus variables
-corpus = nx.Graph()
+#corpus = nx.Graph()
 #crpFileName = "us history timeline v2.txt"
-crpFileName = "history.txt"
+#crpFileName = "history.txt"
 #crpFile = open(crpFileName, 'r')
 #crpLines = crpFile.readline()
 #crpLines = crpLines.split(" ")
 #crpLines = [str for str in crpLines if str != ""]
 
-crpLines = set()#[]
-with open(crpFileName,'r') as f:
-    for line in f:
-        for word in line.split():
+#crpLines = set()#[]
+#with open(crpFileName,'r') as f:
+    #for line in f:
+        #for word in line.split():
             #if (word != "" and len(word) > 2 and word[0].isupper() and word[1].islower()):
             #crpLines.append(word)
-            crpLines.add(word)
+            #crpLines.add(word)
 
-crpEdgeWeight = 1
-capNodeWeight = 5
-crpMaxX = len(crpLines)
+#crpEdgeWeight = 1
+#capNodeWeight = 5
+#crpMaxX = len(crpLines)
 
-neighborNum = int(input("Min num neighbors for each node (2 or more):\r\n"))
+#neighborNum = int(input("Min num neighbors for each node (2 or more):\r\n"))
 
 #Graph variables
 graph = nx.Graph()
 #fileName = "a.txt"
-fileName = "a5k.txt"
+fileName = "user tweets.txt"
 if (len(sys.argv) > 1):
     fileName = sys.argv[1]
 historyData = set()
@@ -47,6 +47,7 @@ minEdgeWeight = 1
 edgeWeightList = []
 #print(len(content))
 
+'''
 #Creates the corpus----------------------------------------------------
 words = [normalizr.normalize(word) for word in crpLines]
 words = [word for word in words if len(word) > 1]
@@ -116,6 +117,7 @@ crpNodeList = corpus.nodes()
 #exit()
 
 #--------------------------------------------------------------------
+'''
 
 bannedWords = ["", "rt", "amp"]
 for x in range(0, len(content)):
@@ -123,38 +125,38 @@ for x in range(0, len(content)):
     stringList[x] = content[x].split(" ")
 
 #Used to store the index of the tweet that contains a word in the corpus
-idxInCorpus = -1
+dxInCorpus = -1
 
 for x in range(0, len(content)):
     if (x % 100 == 0):
-        print("tweet " + str(x))
+        print("tweet " + str(x) + " of " + str(len(content)))
     tweetWords = stringList[x]
     numWords = len(tweetWords)
     for i in range (0, numWords):
         word = normalizr.normalize(stringList[x][i].lower())
         stringList[x][i] = word
-    numWordsInCorpus = 0;
+    #numWordsInCorpus = 0;
     for i in range(0, numWords):
         word = stringList[x][i]
-        if (word in crpNodeList):
-            numWordsInCorpus = numWordsInCorpus + 1;
-    if (numWordsInCorpus > 1):
+        #if (word in crpNodeList):
+         #   numWordsInCorpus = numWordsInCorpus + 1;
+    #if (numWordsInCorpus > 1):
         for i in range(0, numWords):
             firstWord = stringList[x][i]
             for j in range(i+1, numWords):
                 secondWord = stringList[x][j]
                 w = 1
-                if (firstWord in crpNodeList or secondWord in crpNodeList):
+                #if (firstWord in crpNodeList or secondWord in crpNodeList):
                 #if (firstWord in crpNodeList and secondWord in crpNodeList):
-                    if graph.has_edge(firstWord, secondWord):
-                        updatedWeight = graph[firstWord][secondWord]['weight'] + w
-                        graph.add_edge(firstWord, secondWord, weight=updatedWeight)
+                if graph.has_edge(firstWord, secondWord):
+                    updatedWeight = graph[firstWord][secondWord]['weight'] + w
+                    graph.add_edge(firstWord, secondWord, weight=updatedWeight)
                         #elif corpus.has_edge(firstWord, secondWord):
                         #    crpEdgeWeight = corpus[firstWord][secondWord]['weight']
                         #    graph.add_edge(firstWord, secondWord, weight=crpEdgeWeight)
-                    elif (firstWord not in bannedWords) and (secondWord not in bannedWords):
-                        #graph.add_edge(firstWord, secondWord, weight=minEdgeWeight)
-                        graph.add_edge(firstWord, secondWord, weight=w)
+                elif (firstWord not in bannedWords) and (secondWord not in bannedWords):
+                    #graph.add_edge(firstWord, secondWord, weight=minEdgeWeight)
+                    graph.add_edge(firstWord, secondWord, weight=w)
                     
 edgeList = graph.edges()
 
@@ -188,8 +190,4 @@ print(graph.edges())
 #nx.draw(corpus, with_labels = True, node_size=1000, node_color="g", font_size=10)
 nx.draw(graph, with_labels = True, node_size=1000, node_color="g", font_size=10)
 plotter.show()
-
-
-
-
 

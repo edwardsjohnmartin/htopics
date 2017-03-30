@@ -1,11 +1,14 @@
 import tweepy
+import time
 from normalizr import Normalizr
 
+#The current date
+date = "(" + str(time.localtime().tm_mon) + "-" + str(time.localtime().tm_mday) + ")"
 
 numTweetsToSave = input("Tweets to download: " + "\r\n")
 numTweetsToSave = int(numTweetsToSave)
 phraseToTrack = input("Phrase to track: " + "\r\n")
-fileName = phraseToTrack + ".txt"
+fileName = phraseToTrack + " " + date + ".txt"
 tweetList = [] #Stores each tweet
 stringList = [] #Stores each word from each tweet (2D)
 
@@ -57,6 +60,8 @@ class TrimmedListener(tweepy.streaming.StreamListener):
         tweetText = normalizr.normalize(tweetText)
         SaveTweetToFile(tweetText, fileName)
         tweetList.append(tweetText)
+        if len(tweetList)%100==0:
+            print(len(tweetList))
         if len(tweetList) < numTweetsToSave:
             return True
         else:
